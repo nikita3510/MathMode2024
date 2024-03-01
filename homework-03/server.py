@@ -19,14 +19,6 @@ def hello():
 
 @app.route("/send", methods= ['POST'])
 def send_message():
-    '''
-    функция для отправки нового сообщения пользователем
-    :return:
-    '''
-    # TODO
-    # проверить, является ли присланное пользователем правильным json-объектом
-    # проверить, есть ли там имя и текст
-    # Добавить сообщение в базу данных db
     data = flask.request.json
     if not isinstance(data, dict):
         return abort(400)
@@ -48,6 +40,12 @@ def send_message():
         'name': name,
         'time': time.time()
     }
+    if text == 'SOS':
+        massage = {
+            'text': "Щас помогу",
+            'name': 'Бот',
+            'time': time.time()
+        }
     db.append(message)
     return {'ok': True}
 
@@ -65,18 +63,26 @@ def get_messages():
 
 @app.route("/status")
 def print_status():
+    all = []
+    for k in db:
+        if k['name'] not in all:
+            all.append(k['name'])
     return {
        "firstName": "Иван",
        "lastName": "Иванов",
        "address": {
            "streetAddress": "Московское ш., 101, кв.101",
            "city": "Ленинград",
-           "postalCode": 101101
+           "postalCode": 101101,
+
        },
        "phoneNumbers": [
            "812 123-1234",
            "916 123-4567"
-       ]
+
+       ],
+        "all messages": len(db),
+        "all users": len(all)
     }
 
 @app.route('/index')
